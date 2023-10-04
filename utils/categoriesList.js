@@ -1,0 +1,15 @@
+export const categoriesList = [
+  'Income',
+  'Main expenses',
+  'Software',
+  'Others',
+  'Car',
+  'Power utility',
+  'Water and sewage utility',
+  'Natural gas utility',
+  'Internet link',
+  'Food',
+  'Kids',
+  'Education',
+  'Entertaiment',
+];
