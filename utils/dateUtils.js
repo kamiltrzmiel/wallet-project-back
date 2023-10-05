@@ -1,4 +1,4 @@
-import moment from 'moment/moment';
+import moment from 'moment';
 
 const formatDateToDDMMYYYY = dateString => {
   const formats = [
