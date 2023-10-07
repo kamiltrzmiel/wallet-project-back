@@ -35,10 +35,10 @@ export const registerUser = async (req, res) => {
     });
 
     // generuje tokeny acces i refresh z tokenUtils
-    const { accessToken, refreshToken } = generateAuthTokens(user._id);
+    const { getToken, refreshToken } = generateAuthTokens(user._id);
 
     res.status(201).json({
-      accessToken,
+      getToken,
       refreshToken,
       user,
     });
@@ -67,10 +67,10 @@ export const loginUser = async (req, res) => {
     }
 
     // generuje tokeny acces i refresh z tokenUtils
-    const { accessToken, refreshToken } = generateAuthTokens(user._id);
+    const { getToken, refreshToken } = generateAuthTokens(user._id);
 
     res.json({
-      accessToken,
+      getToken,
       refreshToken,
       user,
     });
@@ -106,10 +106,10 @@ export const getUserProfile = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     //pobiera token z headera autoryzacji - dzieli zeby zostawic bearer token
-    const accessToken = req.header('Authorization').split(' ')[1];
+    const getToken = req.header('Authorization').split(' ')[1];
 
     //weryfikacja przez sekret - jesli skuteczna pobiera user ID
-    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+    const decoded = jwt.verify(getToken, process.env.JWT_SECRET);
 
     const user = await User.findById(decoded.id);
 
@@ -117,7 +117,7 @@ export const logoutUser = async (req, res) => {
       return res.status(404).json({ error: 'User not found', user });
     }
 
-    await Tokens.create({ token: accessToken });
+    await Tokens.create({ token: getToken });
 
     res.status(200).json({ message: 'Logged out successfully', user });
   } catch (error) {
@@ -152,14 +152,14 @@ export const refreshTokens = async (req, res) => {
       throw new Error('Token in use', isInUse);
     }
 
-    const { accessToken, refreshToken: newRefreshToken } = generateAuthTokens(user._id);
+    const { getToken, refreshToken: newRefreshToken } = generateAuthTokens(user._id);
 
     user.refreshToken = newRefreshToken;
 
     await user.save();
 
     res.json({
-      accessToken,
+      getToken,
       refreshToken: newRefreshToken,
     });
   } catch (error) {
