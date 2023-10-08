@@ -19,9 +19,9 @@ router.post('/login', loginUser);
 router.post('/logout', logoutUser);
 
 // Trasa do pobierania profilu użytkownika
-router.get('/profile', auth, getUserProfile);
+router.get('/profile', getUserProfile);
 
 // Trasa do aktualizacji profilu użytkownika
-router.put('/profile', auth, updateUserProfile);
+router.put('/profile', updateUserProfile);
 
 export default router;
