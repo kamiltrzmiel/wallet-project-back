@@ -6,7 +6,7 @@ import {
   getUserProfile,
   updateUserProfile,
 } from '../controllers/userCtrl';
-
+import auth from '../middlewares/authMiddleware';
 const router = express.Router();
 
 // Trasa do rejestracji użytkownika
@@ -19,9 +19,9 @@ router.post('/login', loginUser);
 router.post('/logout', logoutUser);
 
 // Trasa do pobierania profilu użytkownika
-router.get('/profile', getUserProfile);
+router.get('/profile', auth, getUserProfile);
 
 // Trasa do aktualizacji profilu użytkownika
-router.put('/profile', updateUserProfile);
+router.put('/profile', auth, updateUserProfile);
 
 export default router;
