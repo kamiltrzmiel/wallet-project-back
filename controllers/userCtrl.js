@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 // import { TokenExpiredError } from 'jsonwebtoken';
 import { generateAuthTokens } from '../utils/tokenUtils.js';
 import validator from 'validator';
+
 const { TokenExpiredError } = jwt;
 
 //rejstr uzytkownika
@@ -61,9 +62,7 @@ export const loginUser = async (req, res) => {
       throw new Error('Invalid credentials', user);
     }
 
-    const isMatch = await user.comparePassword(password);
-
-    if (!isMatch) {
+    if (password !== user.password) {
       throw new Error('Invalid credentials', user);
     }
 
