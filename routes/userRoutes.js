@@ -1,16 +1,20 @@
 import express from 'express';
 import { registerUser, loginUser, logoutUser, getUserProfile } from '../controllers/userCtrl';
 import auth from '../middlewares/authMiddleware';
-const router = express.Router();
+
+export const userRouter = express.Router();
 
 // Trasa do rejestracji użytkownika
-router.post('/register', auth, registerUser);
+userRouter.post('/register', registerUser);
 
 // Trasa do logowania użytkownika
-router.post('/login', auth, loginUser);
+userRouter.post('/login', loginUser);
 
 // Trasa do wylogowania użytkownika
-router.get('/logout', auth, logoutUser);
+userRouter.post('/logout', auth, logoutUser);
 
 // Trasa do pobierania profilu użytkownika
-router.get('/profile', auth, getUserProfile);
+userRouter.get('/profile', auth, getUserProfile);
+
+// Trasa do aktualizacji profilu użytkownika
+userRouter.put('/profile', updateUserProfile);
