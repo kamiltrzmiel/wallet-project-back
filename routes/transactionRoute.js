@@ -23,13 +23,13 @@ transRouter.post('/', auth, createTransaction);
 transRouter.delete('/:id', auth, deleteTransaction);
 
 // Trasa do filtrowania transakcji
-transRouter.get('/filter/:month/:year', auth, filterTransactions);
+transRouter.get('/:month/:year', auth, filterTransactions);
 
 // Trasa do aktualizacji transakcji
-transRouter.put('/:id', auth, updateTransaction);
+transRouter.patch('/:id', auth, updateTransaction);
 
 // Trasa do pobrania sumy kategorii
-transRouter.get('/totals', auth, getCategoryTotals);
+transRouter.get('/categories/totals', auth, getCategoryTotals);
 
 // Trasa do pobrania sumy kategorii z filtrem
-transRouter.get('/totals/:month/:year', auth, getFilteredCategoryTotals);
+transRouter.get('/categories/:month/:year', auth, getFilteredCategoryTotals);

@@ -11,10 +11,7 @@ userRouter.post('/register', registerUser);
 userRouter.post('/login', loginUser);
 
 // Trasa do wylogowania użytkownika
-userRouter.post('/logout', auth, logoutUser);
+userRouter.get('/logout', auth, logoutUser);
 
 // Trasa do pobierania profilu użytkownika
 userRouter.get('/profile', auth, getUserProfile);
-
-// Trasa do aktualizacji profilu użytkownika
-userRouter.put('/profile', updateUserProfile);
