@@ -1,9 +1,10 @@
-import { User } from '../models/user';
-import { Tokens } from '../models/usedTokens';
+import { User } from '../models/user.js';
+import { Tokens } from '../models/usedTokens.js';
 import jwt from 'jsonwebtoken';
-import { TokenExpiredError } from 'jsonwebtoken';
-import { generateAuthTokens } from '../utils/tokenUtils';
+// import { TokenExpiredError } from 'jsonwebtoken';
+import { generateAuthTokens } from '../utils/tokenUtils.js';
 import validator from 'validator';
+const { TokenExpiredError } = jwt;
 
 //rejstr uzytkownika
 export const registerUser = async (req, res) => {

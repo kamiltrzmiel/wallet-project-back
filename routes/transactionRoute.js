@@ -1,15 +1,15 @@
 import express from 'express';
 import {
   getAllTransactions,
-  createTransaction,
+  createTranasaction,
   deleteTransaction,
   filterTransactions,
   updateTransaction,
   getCategoryTotals,
   getFilteredCategoryTotals,
-} from '../controllers/transcationCtrl';
+} from '../controllers/transcationCtrl.js';
 
-import auth from '../middlewares/authMiddleware';
+import { auth } from '../middlewares/authMiddleware.js';
 
 export const transRouter = express.Router();
 
@@ -17,7 +17,7 @@ export const transRouter = express.Router();
 transRouter.get('/', auth, getAllTransactions);
 
 // Trasa do tworzenia nowej transakcji
-transRouter.post('/', auth, createTransaction);
+transRouter.post('/', auth, createTranasaction);
 
 // Trasa do usuwania transakcji
 transRouter.delete('/:id', auth, deleteTransaction);

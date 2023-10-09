@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-import { Transactions } from '../models/transaction';
-import { formatDateToDDMMYYYY } from '../utils/dateUtils';
-import { categoriesList } from '../utils/categoriesList';
+import { Transactions } from '../models/transaction.js';
+import { formatDateToDDMMYYYY } from '../utils/dateUtils.js';
+import { categoriesList } from '../utils/categoriesList.js';
 
 export const getAllTransactions = async (req, res) => {
   try {
