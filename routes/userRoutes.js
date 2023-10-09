@@ -1,11 +1,5 @@
 import express from 'express';
-import {
-  registerUser,
-  loginUser,
-  logoutUser,
-  getUserProfile,
-  updateUserProfile,
-} from '../controllers/userCtrl';
+import { registerUser, loginUser, logoutUser, getUserProfile } from '../controllers/userCtrl';
 import auth from '../middlewares/authMiddleware';
 
 export const userRouter = express.Router();

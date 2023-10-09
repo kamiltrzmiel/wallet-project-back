@@ -8,6 +8,7 @@ import {
   getCategoryTotals,
   getFilteredCategoryTotals,
 } from '../controllers/transcationCtrl';
+
 import auth from '../middlewares/authMiddleware';
 
 export const transRouter = express.Router();
