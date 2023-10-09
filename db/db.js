@@ -3,7 +3,7 @@ import { config } from 'dotenv';
 
 config();
 
-const connectDB = async () => {
+export const connectDB = async () => {
   try {
     const connect = await mongoose.connect(process.env.DB_HOST, {
       useNewUrlParser: true,
