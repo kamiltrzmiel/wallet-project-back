@@ -1,7 +1,7 @@
 import express from 'express';
 import {
   getAllTransactions,
-  createTranasaction,
+  createTransaction,
   deleteTransaction,
   filterTransactions,
   updateTransaction,
@@ -17,7 +17,7 @@ export const transRouter = express.Router();
 transRouter.get('/', auth, getAllTransactions);
 
 // Trasa do tworzenia nowej transakcji
-transRouter.post('/', auth, createTranasaction);
+transRouter.post('/', auth, createTransaction);
 
 // Trasa do usuwania transakcji
 transRouter.delete('/:id', auth, deleteTransaction);

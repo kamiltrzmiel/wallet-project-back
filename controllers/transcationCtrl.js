@@ -12,7 +12,7 @@ export const getAllTransactions = async (req, res) => {
   }
 };
 
-export const createTranasaction = async (req, res) => {
+export const createTransaction = async (req, res) => {
   try {
     const { amount, category, date, isIncome, comment } = req.body;
 
