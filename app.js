@@ -2,10 +2,13 @@ import { config } from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
-import { connectDB } from './db/db';
-import { userRouter } from './routes/userRoutes';
-import { transRouter } from './routes/transactionRoute';
-import app from 'express';
+import swaggerDocument from './docs/swagger.json' assert { type: 'json' };
+import { connectDB } from './db/db.js';
+import { userRouter } from './routes/userRoutes.js';
+import { transRouter } from './routes/transactionRoute.js';
+import log4js from 'log4js';
+
+export const app = express();
 
 log4js.configure({
   appenders: {
@@ -30,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 // API docs
-// app.use('/sciezka_do_dokumetacji', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/wallet', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use((req, res, next) => {
   const startTime = new Date();
@@ -51,10 +54,11 @@ app.use((req, res, next) => {
 //Routing
 app.use('/api/users', userRouter);
 app.use('/api/transactions', transRouter);
+
 app.get('/api/heartbeat', (req, res) => {
   res.json({ status: 'ok' });
 });
-// Error handling middleware
+//Error handling middleware
 app.use((err, req, res, next) => {
   // Check if the error is a known Mongoose validation error
   if (err.name === 'ValidationError') {
@@ -62,7 +66,7 @@ app.use((err, req, res, next) => {
     return res.status(400).json({ errors });
   }
 
-  // Handle other types of errors (including unhandled rejections)
+  //Handle other types of errors (including unhandled rejections)
   if (err) {
     logger.error(err.stack);
   }

@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { categoriesList } from '../utils/categoriesList';
+import { categoriesList } from '../utils/categoriesList.js';
 
 const transactionSchema = new Schema(
   {
