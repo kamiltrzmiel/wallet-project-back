@@ -8,28 +8,26 @@ import {
   getCategoryTotals,
   getFilteredCategoryTotals,
 } from '../controllers/transcationCtrl';
-
+import { auth } from '../middlewares/authMiddleware';
 const router = express.Router();
 
 // Trasa do pobrania wszystkich transakcji
-router.get('/', getAllTransactions);
+router.get('/', auth, getAllTransactions);
 
 // Trasa do tworzenia nowej transakcji
-router.post('/', createTransaction);
+router.post('/', auth, createTransaction);
 
 // Trasa do usuwania transakcji
-router.delete('/:id', deleteTransaction);
+router.delete('/:id', auth, deleteTransaction);
 
 // Trasa do filtrowania transakcji
-router.get('/filter/:month/:year', filterTransactions);
+router.get('/:month/:year', auth, filterTransactions);
 
 // Trasa do aktualizacji transakcji
-router.put('/:id', updateTransaction);
+router.patch('/:id', auth, updateTransaction);
 
 // Trasa do pobrania sumy kategorii
-router.get('/totals', getCategoryTotals);
+router.get('/categories/totals', auth, getCategoryTotals);
 
 // Trasa do pobrania sumy kategorii z filtrem
-router.get('/totals/:month/:year', getFilteredCategoryTotals);
-
-export default router;
+router.get('/categories/:month/:year', auth, getFilteredCategoryTotals);
