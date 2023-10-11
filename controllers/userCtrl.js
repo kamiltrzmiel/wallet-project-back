@@ -1,26 +1,14 @@
+import bcrypt from 'bcryptjs';
 import { User } from '../models/user.js';
-import { Tokens } from '../models/usedTokens.js';
 import jwt from 'jsonwebtoken';
-// import { TokenExpiredError } from 'jsonwebtoken';
-import { generateAuthTokens } from '../utils/tokenUtils.js';
-import validator from 'validator';
-
-const { TokenExpiredError } = jwt;
+import dotenv from 'dotenv';
+dotenv.config();
 
 //rejstr uzytkownika
 export const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
-
-  //spr formatu maila przez validator
-
-  if (!validator.isEmail(email)) {
-    return res.status(400).json({
-      error: 'Invalid email format',
-      email,
-    });
-  }
-
   try {
+    const { name, email, password } = req.body;
+
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -36,135 +24,131 @@ export const registerUser = async (req, res) => {
       password,
     });
 
-    // generuje tokeny acces i refresh z tokenUtils
-    const { getToken, refreshToken } = generateAuthTokens(user._id);
+    const payload = {
+      id: user.id,
+      username: email,
+    };
 
-    res.status(201).json({
-      getToken,
-      refreshToken,
-      user,
-    });
+    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: '1h' });
+
+    user.token = token;
+    await user.save();
+
+    res.status(201).json({ message: registrationSuccess, user: { name, email, token } });
   } catch (error) {
-    res.status(400).json({
-      error: error.message,
-      existingUser,
-    });
+    console.error(error);
+    res.status(500).json({ error: 'Registration failed' });
   }
 };
 
 export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-
   try {
+    const { email, password } = req.body;
+
     const user = await User.findOne({ email });
 
+    //sprawdzenie nazwy użytkownika
     if (!user) {
-      throw new Error('Invalid credentials', user);
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    if (password !== user.password) {
-      throw new Error('Invalid credentials', user);
+    const name = user.name;
+    //porównanie hasła
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Inavlid password' });
     }
 
-    // generuje tokeny acces i refresh z tokenUtils
-    const { getToken, refreshToken } = generateAuthTokens(user._id);
+    const payload = {
+      id: user.id,
+      username: user.email,
+    };
 
-    res.json({
-      getToken,
-      refreshToken,
-      user,
+    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: '1h' });
+
+    user.token = token;
+    await user.save();
+
+    res.status(200).json({
+      message: 'Login successful',
+      token: token,
+      // refreshToken: newRefreshToken,
+
+      user: { name, email, token },
     });
   } catch (error) {
-    res.status(400).json({
-      error: error.message,
-    });
+    console.error(error);
+    res.status(500).json({ error: 'Login failed' });
   }
 };
 
 export const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user.id);
 
     if (!user) {
-      return res.status(404).json({
-        error: 'User not found',
-        user,
-      });
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json({
-      name: user.name,
-      email: user.email,
-    });
-  } catch (error) {
-    res.status(500).json({
-      error: error.message,
-    });
+    const { name, token } = user;
+
+    res.status(200).json({ name, token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Get user profile failed' });
+  }
+};
+
+export const refreshTokens = async (req, res) => {
+  try {
+    const refreshToken = req.body.refreshToken;
+
+    if (!refreshToken) {
+      return res
+        .status(400)
+        .json({ error: `Refresh token is required << ''refreshToken'' : ''string'' >>` });
+    }
+
+    const user = await User.findOne({ token: refreshToken });
+
+    if (!user) {
+      return res.status(401).json({ error: 'Refresh token is not valid' });
+    }
+
+    const payload = {
+      id: user.id,
+      username: user.email,
+    };
+
+    const newAccessToken = jwt.sign(payload, process.env.SECRET, { expiresIn: '1h' });
+
+    user.token = newAccessToken;
+    await user.save();
+
+    res.status(200).json({ message: 'Token refreshed successfully', token: newAccessToken });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Token refresh failed' });
   }
 };
 
 export const logoutUser = async (req, res) => {
   try {
-    //pobiera token z headera autoryzacji - dzieli zeby zostawic bearer token
-    const getToken = req.header('Authorization').split(' ')[1];
-
-    //weryfikacja przez sekret - jesli skuteczna pobiera user ID
-    const decoded = jwt.verify(getToken, process.env.JWT_SECRET);
-
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(req.user.id);
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found', user });
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    await Tokens.create({ token: getToken });
-
-    res.status(200).json({ message: 'Logged out successfully', user });
-  } catch (error) {
-    if (error instanceof TokenExpiredError) {
-      return res.status(401).json({ error: 'Token expired' });
-    } else {
-      console.error(error);
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-  }
-};
-
-export const refreshTokens = async (req, res) => {
-  const refreshToken = req.body.refreshToken;
-
-  try {
-    const decodedRefreshToken = jwt.verify(refreshToken, process.env.JWT_SECRET);
-
-    if (decodedRefreshToken.type !== 'refresh') {
-      throw new Error('Invalid refresh token');
-    }
-
-    const user = await User.findById(decodedRefreshToken.id);
-
-    if (!user) {
-      throw new Error('Invalid refresh token', user);
-    }
-
-    const isInUse = await Tokens.exists({ token: refreshToken });
-
-    if (isInUse) {
-      throw new Error('Token in use', isInUse);
-    }
-
-    const { getToken, refreshToken: newRefreshToken } = generateAuthTokens(user._id);
-
-    user.refreshToken = newRefreshToken;
-
+    user.token = null;
+    // user.refreshToken = null;
     await user.save();
+    const { name } = user;
 
-    res.json({
-      getToken,
-      refreshToken: newRefreshToken,
-    });
-  } catch (error) {
-    res.status(401).json({
-      error: error.message,
-    });
+    res.status(200).json({ message: `Logout ${name} successful` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Logout failed' });
   }
 };

@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { categoriesList } from '../utils/categoriesList.js';
 
-const transactionSchema = new Schema(
+const transaction = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId, //defincja dla MongoDB - indentyfikacja dokumentu kolekcji porzez ObjectId
@@ -37,8 +37,9 @@ const transactionSchema = new Schema(
     },
   },
   {
+    versionKey: false,
     timestamps: true,
   }
 );
 
-export const Transactions = model('Transactions', transactionSchema);
+export const Transaction = model('transaction', transaction);
