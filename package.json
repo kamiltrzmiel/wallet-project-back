@@ -9,6 +9,17 @@
     "lint": "eslint **/*.js",
     "lint:fix": "eslint --fix **/*.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kamiltrzmiel/wallet-project-back.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kamiltrzmiel/wallet-project-back/issues"
+  },
+  "homepage": "https://github.com/kamiltrzmiel/wallet-project-back#readme",
   "dependencies": {
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
@@ -16,25 +27,18 @@
     "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "express-validator": "^7.0.1",
+    "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.1",
-    "log4js": "^6.9.1",
     "moment": "^2.29.4",
     "mongoose": "^7.4.0",
     "morgan": "^1.10.0",
     "passport": "^0.6.0",
+    "passport-jwt": "^4.0.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
-    "uuid": "^9.0.0",
-    "validator": "^13.11.0"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "eslint": "^7.19.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.25.3",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.2.0",
     "nodemon": "^2.0.15"
   }
 }
