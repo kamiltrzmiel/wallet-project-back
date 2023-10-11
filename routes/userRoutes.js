@@ -15,7 +15,7 @@ export const userRouter = express.Router();
 userRouter.post('/register', validateRegister, registerUser);
 
 // Trasa do logowania użytkownika
-userRouter.post('/login', validateLogin, loginUser);
+userRouter.post('/login', loginUser); //without validateLogin
 
 // Trasa do refresh tokena
 userRouter.post('/refresh', refreshTokens);

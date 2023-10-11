@@ -3,14 +3,14 @@ import Joi from 'joi';
 export const registrationSchema = Joi.object({
   name: Joi.string().min(1).required(),
   email: Joi.string()
-    .email({ tlds: { allow: false } })
+    .email({ tlds: { allow: true } })
     .required(),
   password: Joi.string().min(1).required(),
 });
 
 export const loginSchema = Joi.object({
   email: Joi.string()
-    .email({ tlds: { allow: false } })
+    .email({ tlds: { allow: true } })
     .required(),
   password: Joi.string().required(),
 });
