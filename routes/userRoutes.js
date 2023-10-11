@@ -12,7 +12,7 @@ import {
 export const userRouter = express.Router();
 
 // Trasa do rejestracji użytkownika
-userRouter.post('/register', validateRegister, registerUser);
+userRouter.post('/register', registerUser);
 
 // Trasa do logowania użytkownika
 userRouter.post('/login', loginUser); //without validateLogin

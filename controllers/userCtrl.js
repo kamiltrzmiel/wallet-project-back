@@ -7,7 +7,10 @@ dotenv.config();
 //rejstr uzytkownika
 export const registerUser = async (req, res) => {
   try {
+    console.log('Received registration request:', req.body);
+
     const { name, email, password } = req.body;
+    console.log('Received user details:', { name, email });
 
     const existingUser = await User.findOne({ email });
 
@@ -17,26 +20,29 @@ export const registerUser = async (req, res) => {
         existingUser,
       });
     }
-
+    //tutaj hashuje haselo
     const user = await User.create({
       name,
       email,
       password,
     });
+    console.log('User created:', user);
 
     const payload = {
       id: user.id,
       username: email,
     };
 
-    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     user.token = token;
     await user.save();
-
+    const registrationSuccess = 'Registration successful';
     res.status(201).json({ message: registrationSuccess, user: { name, email, token } });
   } catch (error) {
     console.error(error);
+    console.error('Error during registration:', error);
+
     res.status(500).json({ error: 'Registration failed' });
   }
 };
@@ -53,10 +59,20 @@ export const loginUser = async (req, res) => {
     }
 
     const name = user.name;
+    console.log('User object:', user);
+
+    console.log('Input password:', password);
+    console.log('Stored password:', user.password);
+
+    console.log('Type of input password:', typeof password);
+    console.log('Type of stored password:', typeof user.password);
     //porównanie hasła
     const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log('bcrypt.compare result:', isPasswordValid);
 
     if (!isPasswordValid) {
+      console.log('Password comparison failed.');
+
       return res.status(401).json({ error: 'Inavlid password' });
     }
 
@@ -65,7 +81,7 @@ export const loginUser = async (req, res) => {
       username: user.email,
     };
 
-    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     user.token = token;
     await user.save();
@@ -121,7 +137,7 @@ export const refreshTokens = async (req, res) => {
       username: user.email,
     };
 
-    const newAccessToken = jwt.sign(payload, process.env.SECRET, { expiresIn: '1h' });
+    const newAccessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     user.token = newAccessToken;
     await user.save();

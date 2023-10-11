@@ -26,15 +26,14 @@ const userSchema = new Schema(
 );
 
 //szyfrowanie hasła
-userSchema.pre('save', async next => {
-  const user = this;
-  if (user.isModified('password')) {
-    user.password = await bcrypt.hash(user.password, 10);
+userSchema.pre('save', async function (next) {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });
 //porównanie hasła szyfrowanego z wproawadzonym
-userSchema.methods.comparePassword = async enteredPassword => {
+userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
