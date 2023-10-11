@@ -1,0 +1,15 @@
+export const categoriesBalance = [
+  { name: 'Income' },
+  { name: 'Main expenses' },
+  { name: 'Software' },
+  { name: 'Others' },
+  { name: 'Car' },
+  { name: 'Power utility' },
+  { name: 'Water and sewage utility' },
+  { name: 'Natural gas utility' },
+  { name: 'Internet link' },
+  { name: 'Food' },
+  { name: 'Kids' },
+  { name: 'Education' },
+  { name: 'Entertainment' },
+];

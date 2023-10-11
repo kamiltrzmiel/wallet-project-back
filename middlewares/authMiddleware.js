@@ -1,37 +1,41 @@
-import jwt from 'jsonwebtoken';
 import { User } from '../models/user.js';
-import { Tokens } from '../models/usedTokens.js';
-// import { TokenExpiredError } from 'jsonwebtoken';
-const { TokenExpiredError } = jwt;
+import passport from '../utils/config-passport.js';
+import jwt from 'jsonwebtoken';
+import { refreshTokens } from '../controllers/userCtrl.js';
 
 export const auth = async (req, res, next) => {
   try {
-    //sprawdza czy jest header
-    const authorizationHeader = req.header('Authorization');
-    if (!authorizationHeader) {
-      return res.status(401).json({ error: 'Authorization header missing' });
-    }
+    await passport.authenticate('jwt', { session: false }, async (err, user) => {
+      if (!user || err) {
+        return res.status(401).json({
+          status: 'error',
+          code: 401,
+          message: 'Unauthorized',
+          data: 'Unauthorized',
+        });
+      }
 
-    const getToken = authorizationHeader.split(' ')[1];
+      const authHeader = req.headers.authorization;
+      const token = authHeader ? authHeader.split(' ')[1] : null;
 
-    const decoded = jwt.verify(getToken, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found', user });
-    }
+      const allUsers = await User.find();
+      if (!allUsers.some(user => user.token === token)) {
+        return res.status(401).json({
+          status: 'error',
+          code: 401,
+          message: 'Token not valid',
+          data: 'Token not valid',
+        });
+      }
 
-    const usedToken = await Tokens.exists({ token: getToken });
-
-    if (usedToken) {
-      return res.status(401).json({ error: 'Access token is in use', usedToken });
-    }
-    req.user = user;
-    next();
+      req.user = user;
+      next();
+    })(req, res, next);
   } catch (error) {
-    if (error instanceof TokenExpiredError) {
-      return res.status(401).json({ error: 'Access token expired' });
-    } else {
-      return res.status(401).json({ error: 'Invalid access token' });
-    }
+    res.status(500).json({
+      status: 'error',
+      code: 500,
+      message: 'An error occurred during authentication.',
+    });
   }
 };

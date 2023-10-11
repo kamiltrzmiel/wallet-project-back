@@ -1,30 +1,29 @@
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
-import User from '../models/user.js';
+import { User } from '../models/user.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
+const secret = 'abcd';
 
-const ExtractJwt = passportJWT.ExtractJwt;
-const JwtStrategy = passportJWT.Strategy;
-
-const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET,
+const ExtractJWT = passportJWT.ExtractJwt;
+const Strategy = passportJWT.Strategy;
+const params = {
+  secretOrKey: secret,
+  jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
 };
 
-const strategy = new JwtStrategy(jwtOptions, async (payload, done) => {
-  try {
-    const user = await User.findById(payload.id);
+passport.use(
+  new Strategy(params, function (payload, done) {
+    User.find({ _id: payload.id })
+      .then(([user]) => {
+        if (!user) {
+          return done(new Error('User not found'));
+        }
+        return done(null, user);
+      })
+      .catch(err => done(err));
+  })
+);
 
-    if (!user) {
-      return done(null, false, { message: 'User not found' });
-    }
-
-    return done(null, user);
-  } catch (error) {
-    return done(error, false, { message: 'Error finding user' });
-  }
-});
-
-passport.use(strategy);
+export default passport;
