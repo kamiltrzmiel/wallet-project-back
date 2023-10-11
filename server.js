@@ -1,13 +1,10 @@
 import { app } from './app.js';
-import { connectDB } from './db/db.js';
-import dotenv from 'dotenv';
+import { config } from 'dotenv';
+import mongoose from 'mongoose';
 
-dotenv.config();
+config();
 
-const port = process.env.PORT || 3001;
-const server = 'http://localhost';
-
-export const serverAddress = `${server}:${port}`;
+const uriDb = process.env.DB_HOST;
 
 const startAnimation = () => {
   const animation = ['| ', '/ ', '- ', '\\ '];
@@ -19,19 +16,20 @@ const startAnimation = () => {
   }, 80);
 };
 
-export const startServer = async () => {
+const runServer = async () => {
   try {
-    await connectDB();
-
-    app.listen(port, () => {
-      console.log(`Server running. API on server: ${serverAddress}`);
+    const connection = await mongoose.connect(uriDb);
+    console.log('Database connection successful');
+    app.listen(3000, () => {
+      console.log('Server running. Use our API on port: 3000');
+      console.log('>>> Press Ctrl+C to stop <<<');
     });
   } catch (error) {
-    console.error('Cannot connect to MongoDB');
+    console.log('Cannot connect to MongoDB');
     console.error(error);
     process.exit(1);
   }
 };
 
-startServer();
+runServer();
 startAnimation();
