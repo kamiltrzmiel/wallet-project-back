@@ -107,8 +107,28 @@ export const filterTransactions = async (req, res) => {
         $match: {
           user: mongoose.Types.ObjectId(req.user._id),
           date: {
-            $gte: new Date(`${year}-${month}-01`),
-            $lt: new Date(`${year}-${Number(month) + 1}-01`),
+            $gte: {
+              $dateFromString: {
+                dateString: {
+                  $concat: [
+                    { $substrCP: [{ $year: '$date' }, 0, -1] },
+                    { $substrCP: [{ $month: '$date' }, 0, -1] },
+                    { $substrCP: [{ $dayOfMonth: '$date' }, 0, -1] },
+                  ],
+                },
+              },
+            },
+            $lt: {
+              $dateFromString: {
+                dateString: {
+                  $concat: [
+                    { $substrCP: [{ $year: '$date' }, 0, -1] },
+                    { $substrCP: [{ $month: '$date' }, 0, -1] },
+                    { $substrCP: [{ $dayOfMonth: '$date' }, 0, -1] },
+                  ],
+                },
+              },
+            },
           },
         },
       },
