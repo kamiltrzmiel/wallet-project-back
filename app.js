@@ -14,7 +14,11 @@ const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
 app.use('/wallet', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use(logger(formatsLogger));
-app.use(cors());
+app.use(
+  cors({
+    origin: 'https://modern-gold-fatigues.cyclic.app/api',
+  })
+);
 app.use(express.json());
 
 app.use('/api/users', usersRouter);
