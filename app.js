@@ -4,6 +4,7 @@ import cors from 'cors';
 
 import { usersRouter } from './routes/userRoutes.js';
 import { transactionRouter } from './routes/transactionRoutes.js';
+import { setupSwagger } from './config/swagger.js';
 
 export const app = express();
 const logger = morgan;
@@ -16,6 +17,8 @@ app.use(express.json());
 
 app.use('/api/users', usersRouter);
 app.use('/api/transactions', transactionRouter);
+
+setupSwagger(app);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });
