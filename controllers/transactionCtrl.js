@@ -153,7 +153,7 @@ export const getAllCategories = async (req, res) => {
 
     const results = await Transaction.aggregate(expensesByCategoriesQuery);
 
-    const totalExpensesByCategories = categoriesList.map(categoryItem => {
+    const totalExpensesByCategories = categoriesBalance.map(categoryItem => {
       const categoryTotal = results.find(aggr => aggr.category === categoryItem.name)?.total;
 
       return {
