@@ -1,170 +1,101 @@
 import bcrypt from 'bcryptjs';
-import { User } from '../models/user.js';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-dotenv.config();
+import { User } from '../models/user.js';
+import { errorRequest } from '../assets/errorMessages.js';
+const secKey = process.env.SECRET_KEY;
 
-//rejstr uzytkownika
-export const registerUser = async (req, res) => {
+export const register = async (req, res) => {
   try {
-    console.log('Received registration request:', req.body);
-
     const { name, email, password } = req.body;
-    console.log('Received user details:', { name, email });
-
-    const existingUser = await User.findOne({ email });
-
-    if (existingUser) {
-      return res.status(409).json({
-        error: 'Email is already in use',
-        existingUser,
-      });
+    const user = await User.findOne({ email });
+    if (user) {
+      throw errorRequest(409, 'Email in use');
     }
-    //tutaj hashuje haselo
-    const user = await User.create({
-      name,
-      email,
-      password,
+    const hashPassword = await bcrypt.hash(password, 10);
+    const result = await User.create({ name, email, password: hashPassword });
+
+    res.status(201).json({
+      name: result.name,
+      email: result.email,
+      subscription: result.subscription,
     });
-    console.log('User created:', user);
-
-    const payload = {
-      id: user.id,
-      username: email,
-    };
-
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    user.token = token;
-    await user.save();
-    const registrationSuccess = 'Registration successful';
-    res.status(201).json({ message: registrationSuccess, user: { name, email, token } });
-  } catch (error) {
-    console.error(error);
-    console.error('Error during registration:', error);
-
-    res.status(500).json({ error: 'Registration failed' });
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
   }
 };
 
-export const loginUser = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw errorRequest(401, 'Email or password is wrong');
+    }
+    const passwordCompare = await bcrypt.compare(password, user.password);
+    if (!passwordCompare) {
+      throw errorRequest(401, 'Email or password is wrong');
+    }
 
+    const payload = {
+      id: user._id,
+    };
+
+    const token = jwt.sign(payload, secKey, { expiresIn: '12h' });
+    await User.findByIdAndUpdate(user._id, { token });
+    res.status(200).json({
+      message: 'Login success',
+      token,
+      name: user.name,
+      email: user.email,
+      subscription: user.subscription,
+    });
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
+  }
+};
+
+export const getCurrent = async (req, res) => {
+  try {
+    const { name, email, subscription } = req.user;
+    res.status(200).json({
+      name,
+      email,
+      subscription,
+    });
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    await User.findByIdAndUpdate(_id, { token: '' });
+    res.status(200).json({
+      message: 'Logout success',
+    });
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
+  }
+};
+
+export const updateUserSubscription = async (req, res) => {
+  try {
+    const { email } = req.user;
+    const { subscription } = req.body;
     const user = await User.findOne({ email });
 
-    //sprawdzenie nazwy użytkownika
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      throw errorRequest(401, 'Email or password is wrong');
     }
 
-    const name = user.name;
-    console.log('User object:', user);
-
-    console.log('Input password:', password);
-    console.log('Stored password:', user.password);
-
-    console.log('Type of input password:', typeof password);
-    console.log('Type of stored password:', typeof user.password);
-    //porównanie hasła
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log('bcrypt.compare result:', isPasswordValid);
-
-    if (!isPasswordValid) {
-      console.log('Password comparison failed.');
-
-      return res.status(401).json({ error: 'Inavlid password' });
-    }
-
-    const payload = {
-      id: user.id,
-      username: user.email,
-    };
-
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    user.token = token;
-    await user.save();
-
+    const result = await User.findByIdAndUpdate(user._id, { subscription });
     res.status(200).json({
-      message: 'Login successful',
-      token: token,
-      // refreshToken: newRefreshToken,
-
-      user: { name, email, token },
+      name: user.name,
+      email: user.email,
+      subscription,
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Login failed' });
-  }
-};
-
-export const getUserProfile = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const { name, token } = user;
-
-    res.status(200).json({ name, token });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Get user profile failed' });
-  }
-};
-
-export const refreshTokens = async (req, res) => {
-  try {
-    const refreshToken = req.body.refreshToken;
-
-    if (!refreshToken) {
-      return res
-        .status(400)
-        .json({ error: `Refresh token is required << ''refreshToken'' : ''string'' >>` });
-    }
-
-    const user = await User.findOne({ token: refreshToken });
-
-    if (!user) {
-      return res.status(401).json({ error: 'Refresh token is not valid' });
-    }
-
-    const payload = {
-      id: user.id,
-      username: user.email,
-    };
-
-    const newAccessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    user.token = newAccessToken;
-    await user.save();
-
-    res.status(200).json({ message: 'Token refreshed successfully', token: newAccessToken });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Token refresh failed' });
-  }
-};
-
-export const logoutUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    user.token = null;
-    // user.refreshToken = null;
-    await user.save();
-    const { name } = user;
-
-    res.status(200).json({ message: `Logout ${name} successful` });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Logout failed' });
+    res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
   }
 };

@@ -1,27 +1,13 @@
 import express from 'express';
-import { auth } from '../middlewares/authMiddleware.js';
-import { validateLogin, validateRegister } from '../middlewares/validMiddleware.js';
-import {
-  registerUser,
-  loginUser,
-  refreshTokens,
-  logoutUser,
-  getUserProfile,
-} from '../controllers/userCtrl.js';
+import { ctrlTask } from '../assets/ctrlTask.js';
+import { validateBody } from '../middlewares/validateBody.js';
+import { authenticate } from '../middlewares/authenticate.js';
+import { register, login, logout } from '../controllers/userCtrl.js';
+import { schemas } from '../models/user.js';
 
-export const userRouter = express.Router();
+export const usersRouter = express.Router();
 
-// Trasa do rejestracji użytkownika
-userRouter.post('/register', registerUser);
-
-// Trasa do logowania użytkownika
-userRouter.post('/login', loginUser); //without validateLogin
-
-// Trasa do refresh tokena
-userRouter.post('/refresh', refreshTokens);
-
-// Trasa do wylogowania użytkownika
-userRouter.get('/logout', auth, logoutUser);
-
-// Trasa do pobierania profilu użytkownika
-userRouter.get('/profile', auth, getUserProfile);
+usersRouter.post('/register', validateBody(schemas.registerSchema), ctrlTask(register));
+usersRouter.post('/login', validateBody(schemas.loginSchema), ctrlTask(login));
+// usersRouter.get('/profile', authenticate, ctrlTask(profile));
+usersRouter.get('/logout', authenticate, ctrlTask(logout));
