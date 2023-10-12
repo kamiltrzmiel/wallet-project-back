@@ -73,8 +73,30 @@ export const updateTransaction = async (req, res) => {
 };
 
 export const filterTransactions = async (req, res) => {
-  const { month, year } = req.parms;
-  // ............................logic
+  const { month, year } = req.params;
+
+  if (!month || !year || !mongoose.Types.ObjectId.isValid(req.user._id)) {
+    return res.status(400).json({ error: 'Invalid input data' });
+  }
+
+  try {
+    const transactions = await Transaction.aggregate([
+      {
+        $match: {
+          user: mongoose.Types.ObjectId(req.user._id),
+          date: {
+            $gte: new Date(`${year}-${month}-01`),
+            $lt: new Date(`${year}-${Number(month) + 1}-01`),
+          },
+        },
+      },
+    ]);
+
+    res.json(transactions);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
 export const getAllCategories = async (req, res) => {
