@@ -78,7 +78,7 @@ export const updateTransaction = async (req, res) => {
     const { _id: user } = req.user;
     const response = await Transaction.findByIdAndUpdate(transactionId, req.body, { new: true });
 
-    if (!response.owner.equals(user)) {
+    if (!response.user.equals(user)) {
       throw errorRequest(403, 'Access denied');
     }
     if (!response) {
