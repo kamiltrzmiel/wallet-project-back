@@ -31,14 +31,16 @@ export const deleteTransaction = async (req, res) => {
   try {
     const { transactionId } = req.params;
     const { _id: user } = req.user;
-    const response = await Contact.findByIdAndRemove(transactionId);
+    const response = await Transaction.findByIdAndRemove(transactionId);
 
     if (!response.user.equals(user)) {
       throw errorRequest(403, 'Access denied');
     }
+
     if (!response) {
       throw errorRequest(404, 'Not found');
     }
+
     res.status(200).json({
       message: 'Transaction deleted',
       response,
