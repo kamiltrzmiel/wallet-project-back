@@ -4,7 +4,7 @@ import cors from 'cors';
 
 import { usersRouter } from './routes/userRoutes.js';
 import { transactionRouter } from './routes/transactionRoutes.js';
-import { setupSwagger } from './config/swagger.js';
+import { setupSwagger } from './utils/swaggerConfig.js';
 
 export const app = express();
 const logger = morgan;

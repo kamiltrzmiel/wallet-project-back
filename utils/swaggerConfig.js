@@ -21,12 +21,17 @@ const swaggerOptions = {
     security: [{ bearerAuth: [] }],
     servers: [
       {
+        description: 'Local Development Server',
+        url: 'http://localhost:3000',
+      },
+
+      {
         description: 'SwaggerHub API Auto Mocking',
         url: 'https://virtserver.swaggerhub.com/wallet/',
       },
     ],
   },
-  apis: ['./routes/*.js'], // Ścieżka do plików zawierających adnotacje JSDoc
+  apis: ['./routes/*.js'],
 };
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
