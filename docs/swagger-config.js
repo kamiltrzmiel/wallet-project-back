@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-const URL_LOCAL = 'http://localhost:3000';
-const URL_SERVER = process.env.SERVER_ADDRESS;
+const LOCAL = 'http://localhost:3000';
+const SERVER = process.env.SERVER_ADDRESS;
 
 export const swaggerOptions = {
   definition: {
@@ -14,11 +14,11 @@ export const swaggerOptions = {
     },
     servers: [
       {
-        url: URL_SERVER,
+        url: SERVER,
         description: 'Cyclic server',
       },
       {
-        url: URL_LOCAL,
+        url: LOCAL,
         description: 'Local server',
       },
     ],
