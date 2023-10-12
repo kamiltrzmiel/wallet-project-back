@@ -1,8 +1,8 @@
 import express from 'express';
+import { register, login, logout } from '../controllers/userCtrl.js';
 import { ctrlTask } from '../assets/ctrlTask.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { authenticate } from '../middlewares/authenticate.js';
-import { register, login, logout } from '../controllers/userCtrl.js';
 import { schemas } from '../models/user.js';
 
 export const usersRouter = express.Router();
