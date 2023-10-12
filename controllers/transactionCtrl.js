@@ -17,16 +17,38 @@ export const getAllTransactions = async (req, res) => {
 
 export const createTransaction = async (req, res) => {
   try {
-    const { _id: user } = req.user;
-    const response = await Transaction.create({ ...req.body, user });
+    const validationResult = validateTransaction(req.body);
 
-    // ......................logic
+    if (validationResult.error) {
+      return res.status(400).json(validationResult.error.details);
+    }
 
-    res.status(201).json({ message: 'Added new transaction', response });
-  } catch (err) {
-    res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
+    const transactionData = validationResult.value;
+    transactionData.user = req.user._id;
+
+    const transaction = await Transaction.create(transactionData);
+
+    res.status(201).json({ message: 'Added new transaction', response: transaction });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong' });
   }
 };
+
+function validateTransaction(data) {
+  const schema = Joi.object({
+    amount: Joi.number().positive().required(),
+    category: Joi.string().required(),
+    date: Joi.string()
+      .pattern(/^(\d{2}-\d{2}-\d{4})$/)
+      .required(),
+    isIncome: Joi.boolean().required(),
+    comment: Joi.string(),
+  });
+
+  return schema.validate(data, { abortEarly: false });
+}
+
 
 export const deleteTransaction = async (req, res) => {
   try {
@@ -73,8 +95,50 @@ export const updateTransaction = async (req, res) => {
 };
 
 export const filterTransactions = async (req, res) => {
-  const { month, year } = req.parms;
-  // ............................logic
+  const { month, year } = req.params;
+
+  if (!month || !year || !mongoose.Types.ObjectId.isValid(req.user._id)) {
+    return res.status(400).json({ error: 'Invalid input data' });
+  }
+
+  try {
+    const transactions = await Transaction.aggregate([
+      {
+        $match: {
+          user: mongoose.Types.ObjectId(req.user._id),
+          date: {
+            $gte: {
+              $dateFromString: {
+                dateString: {
+                  $concat: [
+                    { $substrCP: [{ $year: '$date' }, 0, -1] },
+                    { $substrCP: [{ $month: '$date' }, 0, -1] },
+                    { $substrCP: [{ $dayOfMonth: '$date' }, 0, -1] },
+                  ],
+                },
+              },
+            },
+            $lt: {
+              $dateFromString: {
+                dateString: {
+                  $concat: [
+                    { $substrCP: [{ $year: '$date' }, 0, -1] },
+                    { $substrCP: [{ $month: '$date' }, 0, -1] },
+                    { $substrCP: [{ $dayOfMonth: '$date' }, 0, -1] },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    res.json(transactions);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
 export const getAllCategories = async (req, res) => {

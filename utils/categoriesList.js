@@ -11,5 +11,5 @@ export const categoriesList = [
   'Food',
   'Kids',
   'Education',
-  'Entertaiment',
+  'Entertainment',
 ];
