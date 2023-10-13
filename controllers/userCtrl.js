@@ -71,39 +71,6 @@ export const getCurrent = async (req, res) => {
   }
 };
 
-export const logout = async (req, res) => {
-  try {
-    const { _id } = req.user;
-    await User.findByIdAndUpdate(_id, { token: '' });
-    res.status(200).json({
-      message: 'Logout success',
-    });
-  } catch (err) {
-    res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
-  }
-};
-
-export const updateUserSubscription = async (req, res) => {
-  try {
-    const { email } = req.user;
-    const { subscription } = req.body;
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      throw errorRequest(401, 'Email or password is wrong');
-    }
-
-    const result = await User.findByIdAndUpdate(user._id, { subscription });
-    res.status(200).json({
-      name: user.name,
-      email: user.email,
-      subscription,
-    });
-  } catch (err) {
-    res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
-  }
-};
-
 export const profile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -118,5 +85,17 @@ export const profile = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Get user profile failed' });
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    await User.findByIdAndUpdate(_id, { token: '' });
+    res.status(200).json({
+      message: 'Logout success',
+    });
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
   }
 };
