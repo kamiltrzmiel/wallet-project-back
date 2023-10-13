@@ -55,3 +55,14 @@ export const Transaction = model('transaction', transactionSchema);
 export const schemas = {
   addSchema,
 };
+
+const filterSchema = Joi.object({
+  user: Joi.string().required(),
+  amount: Joi.number().required(),
+  category: Joi.string().required(),
+  date: Joi.string()
+    .pattern(/^(\d{2}-\d{2}-\d{4})$/)
+    .required(),
+  isIncome: Joi.boolean().required(),
+  comment: Joi.string().required(),
+});
