@@ -2,8 +2,8 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { User } from '../models/user.js';
 import { errorRequest } from '../assets/errorMessages.js';
-
 dotenv.config();
+
 const secKey = process.env.SECRET_KEY;
 
 export const authenticate = async (req, res, next) => {
