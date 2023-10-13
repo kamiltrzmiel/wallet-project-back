@@ -24,5 +24,5 @@ transactionRouter.post(
 );
 transactionRouter.delete('/:transactionId', authenticate, validateId, ctrlTask(deleteTransaction));
 transactionRouter.patch('/:transactionId', authenticate, ctrlTask(updateTransaction));
-transactionRouter.get('/:month/:year', authenticate, ctrlTask(filterTransactions));
 transactionRouter.get('/categories/totals', authenticate, ctrlTask(getAllCategories));
+transactionRouter.get('/:month/:year', authenticate, ctrlTask(filterTransactions));
