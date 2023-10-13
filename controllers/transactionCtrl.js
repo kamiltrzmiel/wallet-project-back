@@ -95,15 +95,19 @@ export const updateTransaction = async (req, res) => {
 };
 
 export const filterTransactions = async (req, res) => {
+  console.log('filterTransactions function called');
   const { month, year } = req.params;
+  console.log('Month:', month, 'Year:', year);
 
   if (!month || !year) {
+    console.log('Month or year missing');
     return res.status(400).json({ error: 'Please enter /month(MM) and /year(YYYY)' });
   }
 
   if (!mongoose.Types.ObjectId.isValid(req.user._id)) {
     return res.status(401).json({ error: 'Invalid user' });
   }
+
   const matchStage = [
     {
       $match: {
@@ -112,13 +116,21 @@ export const filterTransactions = async (req, res) => {
           $and: [
             {
               $eq: [
-                { $year: { $dateFromString: { dateString: '$date', format: '%d-%m-%Y' } } },
+                {
+                  $year: {
+                    $dateFromString: { dateString: `${year}-${month}-01`, format: '%Y-%m-%d' },
+                  },
+                },
                 parseInt(year),
               ],
             },
             {
               $eq: [
-                { $month: { $dateFromString: { dateString: '$date', format: '%d-%m-%Y' } } },
+                {
+                  $month: {
+                    $dateFromString: { dateString: `${year}-${month}-01`, format: '%Y-%m-%d' },
+                  },
+                },
                 parseInt(month),
               ],
             },
@@ -130,6 +142,7 @@ export const filterTransactions = async (req, res) => {
 
   try {
     const transactions = await Transaction.aggregate(matchStage);
+    console.log('Transactions:', transactions);
     res.status(200).json({
       status: 'Success',
       code: 200,
@@ -137,6 +150,7 @@ export const filterTransactions = async (req, res) => {
       transactions,
     });
   } catch (error) {
+    console.error('Error in filterTransactions:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
