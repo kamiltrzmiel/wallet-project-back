@@ -2,6 +2,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.js';
 import { errorRequest } from '../assets/errorMessages.js';
+import dotenv from 'dotenv';
+
 const secKey = process.env.SECRET_KEY;
 
 export const register = async (req, res) => {
