@@ -95,7 +95,7 @@ export const filterTransactions = async (req, res) => {
               $eq: [
                 {
                   $year: {
-                    $dateFromString: { dateString: `${year}-${month}-01`, format: '%Y-%m-%d' },
+                    $dateFromString: { dateString: '$date', format: '%d-%m-%Y' },
                   },
                 },
                 parseInt(year),
@@ -105,7 +105,7 @@ export const filterTransactions = async (req, res) => {
               $eq: [
                 {
                   $month: {
-                    $dateFromString: { dateString: `${year}-${month}-01`, format: '%Y-%m-%d' },
+                    $dateFromString: { dateString: '$date', format: '%d-%m-%Y' },
                   },
                 },
                 parseInt(month),
