@@ -1,8 +1,10 @@
+import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.js';
 import { errorRequest } from '../assets/errorMessages.js';
-import dotenv from 'dotenv';
+
+dotenv.config();
 
 const secKey = process.env.SECRET_KEY;
 
