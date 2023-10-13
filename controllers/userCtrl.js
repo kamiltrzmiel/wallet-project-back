@@ -99,3 +99,20 @@ export const updateUserSubscription = async (req, res) => {
     res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
   }
 };
+
+export const profile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const { name, token } = user;
+
+    res.status(200).json({ name, token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Get user profile failed' });
+  }
+};

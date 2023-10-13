@@ -3,6 +3,7 @@ import { errorRequest } from '../assets/errorMessages.js';
 import { categoriesBalance } from '../utils/categoriesBalance.js';
 import { categoriesList } from '../utils/categoriesList.js';
 import { formatDateToDDMMYYYY } from '../utils/dateUtils.js';
+import Joi from 'joi';
 import mongoose from 'mongoose';
 
 export const getAllTransactions = async (req, res) => {
