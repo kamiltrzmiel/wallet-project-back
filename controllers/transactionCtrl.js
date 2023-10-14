@@ -76,7 +76,7 @@ export const updateTransaction = async (req, res) => {
     const { transactionId } = req.params;
     const { _id: user } = req.user;
 
-    const response = await Transaction.findById(transactionId);
+    const currentTransactionToEdit = await Transaction.findById(transactionId);
 
     if (!response) {
       throw errorRequest(404, 'Not found');
@@ -86,12 +86,13 @@ export const updateTransaction = async (req, res) => {
       throw errorRequest(403, 'Access denied');
     }
 
-    Object.assign(response, req.body);
-    const updatedTransaction = await response.save();
+    Object.assign(currentTransactionToEdit, req.body);
+    const response = await currentTransactionToEdit.save();
 
     res.status(200).json({
       message: 'Transaction updated',
-      updatedTransaction,
+      currentTransactionToEdit,
+      response,
     });
   } catch (err) {
     res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
