@@ -78,11 +78,11 @@ export const updateTransaction = async (req, res) => {
 
     const currentTransactionToEdit = await Transaction.findById(transactionId);
 
-    if (!response) {
+    if (!currentTransactionToEdit) {
       throw errorRequest(404, 'Not found');
     }
 
-    if (!response.user.equals(user)) {
+    if (!currentTransactionToEdit.user.equals(user)) {
       throw errorRequest(403, 'Access denied');
     }
 
