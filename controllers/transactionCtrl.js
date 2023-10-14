@@ -50,27 +50,6 @@ export const deleteTransaction = async (req, res) => {
   }
 };
 
-// export const updateTransaction = async (req, res) => {
-//   try {
-//     const { transactionId } = req.params;
-//     const { _id: user } = req.user;
-//     const response = await Transaction.findByIdAndUpdate(transactionId, req.body, { new: true });
-
-//     if (!response.user.equals(user)) {
-//       throw errorRequest(403, 'Access denied');
-//     }
-//     if (!response) {
-//       throw errorRequest(404, 'Not found');
-//     }
-//     res.status(200).json({
-//       message: 'Transaction updated',
-//       response,
-//     });
-//   } catch (err) {
-//     res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
-//   }
-// };
-
 export const updateTransaction = async (req, res) => {
   try {
     const { transactionId } = req.params;
@@ -98,47 +77,6 @@ export const updateTransaction = async (req, res) => {
     res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
   }
 };
-
-// export const updateTransaction = async (req, res) => {
-//   const { id } = req.params;
-
-//   try {
-//     let result = await Transaction.findById(id);
-
-//     if (req.body.date) {
-//       req.body.date = convertDateToDDMMYYYY(req.body.date);
-//       if (req.body.date === 'Invalid date') {
-//         return res.status(400).json({ error: 'Invalid date format' });
-//       }
-//     }
-
-//     if (req.body.category && !validCategories.includes(req.body.category)) {
-//       return res
-//         .status(400)
-//         .json({ error: 'Invalid category provided. Please enter the correct category.' });
-//     }
-
-//     if (!result.user.equals(req.user._id)) {
-//       return res.status(401).json({ error: 'User not authorized' });
-//     }
-
-//     if (!result) {
-//       return res.status(404).json({ error: 'Transaction not found' });
-//     }
-
-//     result = await Transaction.findOneAndUpdate({ _id: id }, { $set: req.body }, { new: true });
-
-//     res.status(200).json({
-//       status: 'Success',
-//       code: 200,
-//       message: `Updated transaction with id ${id}`,
-//       result,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send({ error: 'Internal server error' });
-//   }
-// };
 
 export const filterTransactions = async (req, res) => {
   console.log('filterTransactions function called');
