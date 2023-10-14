@@ -155,9 +155,7 @@ export const getAllCategories = async (req, res) => {
       },
     ];
     const totalIncomeResult = await Transaction.aggregate(totalIncomeQuery);
-
     const totalIncome = totalIncomeResult.length ? totalIncomeResult[0].totalIncome : 0;
-
     const totalExpensesQuery = [
       {
         $match: {
@@ -180,11 +178,8 @@ export const getAllCategories = async (req, res) => {
     ];
 
     const totalExpensesResult = await Transaction.aggregate(totalExpensesQuery);
-
     const totalExpenses = totalExpensesResult.length ? totalExpensesResult[0].totalExpenses : 0;
-
     const balance = totalIncome - totalExpenses;
-
     const expensesByCategoriesQuery = [
       {
         $match: {
