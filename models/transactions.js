@@ -42,7 +42,7 @@ const addSchema = Joi.object({
   category: Joi.string().required(),
   date: Joi.string().required(),
   isIncome: Joi.boolean().required(),
-  comment: Joi.string().required(),
+  comment: Joi.string(),
 });
 
 export const Transaction = model('transaction', transactionSchema);
