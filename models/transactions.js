@@ -37,7 +37,6 @@ const transactionSchema = new Schema(
 transactionSchema.post('save', handleDbErrors);
 
 const addSchema = Joi.object({
-  user: Joi.string().required(),
   amount: Joi.number().required(),
   category: Joi.string().required(),
   date: Joi.string().required(),
