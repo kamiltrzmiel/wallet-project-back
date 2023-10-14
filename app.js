@@ -12,17 +12,17 @@ const logger = morgan;
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
 
-const corsOptions = {
-  origin: ' https://modern-gold-fatigues.cyclic.app',
-  methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-  allowedHeaders:
-    'Authorization, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers',
-  credentials: true,
-};
+// const corsOptions = {
+//   origin: ' https://modern-gold-fatigues.cyclic.app',
+//   methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+//   allowedHeaders:
+//     'Authorization, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers',
+//   credentials: true,
+// };
 
 app.use('/wallet', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(express.json());
 
