@@ -145,7 +145,7 @@ export const getAllCategories = async (req, res) => {
       {
         $match: {
           user: new mongoose.Types.ObjectId(req.user._id),
-          category: 'Income',
+          category: 'income',
         },
       },
       {
@@ -163,11 +163,12 @@ export const getAllCategories = async (req, res) => {
     ];
     const totalIncomeResult = await Transaction.aggregate(totalIncomeQuery);
     const totalIncome = totalIncomeResult.length ? totalIncomeResult[0].totalIncome : 0;
+
     const totalExpensesQuery = [
       {
         $match: {
           user: new mongoose.Types.ObjectId(req.user._id),
-          category: { $ne: 'Income' },
+          category: { $ne: 'income' },
         },
       },
       {
