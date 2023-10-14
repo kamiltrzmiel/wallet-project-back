@@ -11,25 +11,35 @@ export const app = express();
 const logger = morgan;
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
+
 app.use('/wallet', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-app.use((req, res, next) => {
-  // res.setHeader('Access-Control-Allow-Origin', 'profound-hamster-010baa.netlify.app');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'Access-Control-Allow-Headers, Access-Control-Allow-Origin, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers'
-  );
+// app.use((req, res, next) => {
+//   // res.setHeader('Access-Control-Allow-Origin', 'profound-hamster-010baa.netlify.app');
+//   res.setHeader('Access-Control-Allow-Origin', '*');
+//   // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+//   // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//   res.setHeader(
+//     'Access-Control-Allow-Headers',
+//     'Access-Control-Allow-Headers, Access-Control-Allow-Origin, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers'
+//   );
 
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  next();
-});
+//   res.setHeader('Access-Control-Allow-Credentials', true);
+//   next();
+// });
+
+const corsOptions = {
+  origin: '*',
+  methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+  allowedHeaders:
+    'Access-Control-Allow-Headers, Access-Control-Allow-Origin, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers',
+  credentials: true,
+};
 
 app.use(logger(formatsLogger));
-app.use(cors());
+// app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use('/api/users', usersRouter);
