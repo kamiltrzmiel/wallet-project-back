@@ -51,7 +51,7 @@ export const login = async (req, res) => {
       token,
       name: user.name,
       email: user.email,
-      subscription: user.subscription,
+      id: user._id,
     });
   } catch (err) {
     res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
