@@ -180,6 +180,10 @@ export const getAllCategories = async (req, res) => {
     const totalExpensesResult = await Transaction.aggregate(totalExpensesQuery);
     const totalExpenses = totalExpensesResult.length ? totalExpensesResult[0].totalExpenses : 0;
     const balance = totalIncome - totalExpenses;
+    console.log(totalExpensesResult);
+    console.log(totalExpenses);
+    console.log(balance);
+
     const expensesByCategoriesQuery = [
       {
         $match: {
