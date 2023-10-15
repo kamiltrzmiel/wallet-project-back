@@ -10,7 +10,9 @@ export const getAllTransactions = async (req, res) => {
     const { _id: user } = req.user;
     const response = await Transaction.find({ user });
     res.status(200).json({ message: 'All transaction list', response });
+    console.log(' getAllTrans after res 200 status');
   } catch (error) {
+    console.log('getAllTrans after catch err');
     res.status(500).json({ message: error });
   }
 };
@@ -18,12 +20,11 @@ export const getAllTransactions = async (req, res) => {
 export const createTransaction = async (req, res) => {
   try {
     const { _id: user } = req.user;
-    // const response =
-    await Transaction.create({ ...req.body, user });
-
-    // res.status(201).json({ message: 'Added new transaction', response });
-    res.status(201);
+    const response = await Transaction.create({ ...req.body, user });
+    console.log('crtTrans after response l23');
+    res.status(201).json({ message: 'Added new transaction', response });
   } catch (error) {
+    console.log('crtTrans after catch err l26');
     console.error(error);
     res.status(error.statusCode || 500).json({ error: error.message || 'Internal Server Error' });
   }
