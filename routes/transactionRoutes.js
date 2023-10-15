@@ -16,13 +16,10 @@ import { authenticate } from '../middlewares/authenticate.js';
 export const transactionRouter = express.Router();
 
 transactionRouter.get('/', authenticate, ctrlTask(getAllTransactions));
-transactionRouter.post(
-  '/',
-  authenticate,
-  validateBody(schemas.addSchema),
-  ctrlTask(createTransaction)
-);
+transactionRouter.post('/', authenticate, ctrlTask(createTransaction));
 transactionRouter.delete('/:transactionId', authenticate, validateId, ctrlTask(deleteTransaction));
 transactionRouter.patch('/:transactionId', authenticate, ctrlTask(updateTransaction));
 transactionRouter.get('/categories/totals', authenticate, ctrlTask(getAllCategories));
 transactionRouter.get('/:month/:year', authenticate, ctrlTask(filterTransactions));
+
+// validateBody(schemas.addSchema)
