@@ -13,23 +13,15 @@ export const authenticate = async (req, res, next) => {
     if (bearer !== 'Bearer' || !token) {
       return res.status(401).json({ error: 'Not authorized' });
     }
-    const decodedToken = jwt.verify(token, secKey);
-    const { id, exp } = decodedToken;
-
-    if (Date.now() >= exp * 1000) {
-      return res.status(401).json({ error: 'Token has expired' });
-    }
-
+    const { id } = jwt.verify(token, secKey);
     const user = await User.findById(id);
 
     if (!user || user.token !== token) {
       return res.status(401).json({ error: 'Not authorized' });
     }
-
     req.user = user;
     next();
-  } catch (error) {
-    console.error('Authentication Error:', error);
+  } catch {
     return res.status(401).json({ error: 'Not authorized' });
   }
 };
