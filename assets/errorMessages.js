@@ -3,7 +3,7 @@ export const errMessages = {
   401: 'Unauthorized',
   402: 'Payment Required',
   403: 'Forbiden',
-  404: 'Not found',
+  404: 'Not found :)',
   405: 'Method Not Allowed',
   406: 'Not Acceptable',
   407: 'Proxy Authentication Required',
