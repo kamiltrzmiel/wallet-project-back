@@ -18,9 +18,11 @@ export const getAllTransactions = async (req, res) => {
 export const createTransaction = async (req, res) => {
   try {
     const { _id: user } = req.user;
-    const response = await Transaction.create({ ...req.body, user });
+    // const response =
+    await Transaction.create({ ...req.body, user });
 
-    res.status(201).json({ message: 'Added new transaction', response });
+    // res.status(201).json({ message: 'Added new transaction', response });
+    res.status(201);
   } catch (error) {
     console.error(error);
     res.status(error.statusCode || 500).json({ error: error.message || 'Internal Server Error' });
