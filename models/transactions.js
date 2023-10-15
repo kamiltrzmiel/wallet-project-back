@@ -4,6 +4,11 @@ import { handleDbErrors } from '../assets/handleDbErrors.js';
 
 const transactionSchema = new Schema(
   {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: true,
+    },
     amount: {
       type: Number,
       required: true,
@@ -55,9 +60,3 @@ const filterSchema = Joi.object({
   isIncome: Joi.boolean().required(),
   comment: Joi.string().required(),
 });
-
-// user: {
-//   type: Schema.Types.ObjectId,
-//   ref: 'user',
-//   required: true,
-// },

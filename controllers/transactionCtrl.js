@@ -56,24 +56,23 @@ export const updateTransaction = async (req, res) => {
     const { _id: user } = req.user;
     console.log('user from transCtrl', user);
 
-    const currentTransactionToEdit = await Transaction.findById(transactionId);
+    const response = await Transaction.findById(transactionId);
 
-    console.log('from curr trans', currentTransactionToEdit.user);
+    console.log('from curr trans', response.user);
 
-    if (!currentTransactionToEdit) {
+    if (!response) {
       throw errorRequest(404, 'Not found');
     }
 
-    if (!currentTransactionToEdit.user.equals(user)) {
+    if (!response.user.equals(user)) {
       throw errorRequest(403, 'Access denied');
     }
 
-    Object.assign(currentTransactionToEdit, req.body);
-    const response = await currentTransactionToEdit.save();
+    Object.assign(response, req.body);
+    await response.save();
 
     res.status(200).json({
       message: 'Transaction updated',
-      currentTransactionToEdit,
       response,
     });
   } catch (err) {
