@@ -21,5 +21,3 @@ transactionRouter.delete('/:transactionId', authenticate, validateId, ctrlTask(d
 transactionRouter.patch('/:transactionId', authenticate, ctrlTask(updateTransaction));
 transactionRouter.get('/categories/totals', authenticate, ctrlTask(getAllCategories));
 transactionRouter.get('/:month/:year', authenticate, ctrlTask(filterTransactions));
-
-// validateBody(schemas.addSchema)

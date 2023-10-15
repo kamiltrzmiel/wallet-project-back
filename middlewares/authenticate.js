@@ -11,17 +11,25 @@ export const authenticate = async (req, res, next) => {
     const { authorization = '' } = req.headers;
     const [bearer, token] = authorization.split(' ');
     if (bearer !== 'Bearer' || !token) {
-      throw errorRequest(401, 'Not authorized');
+      return res.status(401).json({ error: 'Not authorized' });
     }
-    const { id } = jwt.verify(token, secKey);
+    const decodedToken = jwt.verify(token, secKey);
+    const { id, exp } = decodedToken;
+
+    if (Date.now() >= exp * 1000) {
+      return res.status(401).json({ error: 'Token has expired' });
+    }
+
     const user = await User.findById(id);
+
     if (!user || user.token !== token) {
-      throw errorRequest(401, 'Not authorized');
+      return res.status(401).json({ error: 'Not authorized' });
     }
+
     req.user = user;
-    console.log('user from ath midd', user);
     next();
-  } catch {
-    throw errorRequest(401, 'Not authorized');
+  } catch (error) {
+    console.error('Authentication Error:', error);
+    return res.status(401).json({ error: 'Not authorized' });
   }
 };
