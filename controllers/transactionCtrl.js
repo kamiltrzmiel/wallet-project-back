@@ -10,9 +10,7 @@ export const getAllTransactions = async (req, res) => {
     const { _id: user } = req.user;
     const response = await Transaction.find({ user });
     res.status(200).json({ message: 'All transaction list', response });
-    console.log(' getAllTrans after res 200 status');
   } catch (error) {
-    console.log('getAllTrans after catch err');
     res.status(500).json({ message: error });
   }
 };
@@ -20,11 +18,10 @@ export const getAllTransactions = async (req, res) => {
 export const createTransaction = async (req, res) => {
   try {
     const { _id: user } = req.user;
-    const response = await Transaction.create({ ...req.body, user });
-    console.log('crtTrans after response l23');
-    res.status(201).json({ message: 'Added new transaction', response });
+    console.log({ ...req.body, user });
+    const newTransaction = await Transaction.create({ ...req.body, user });
+    res.status(201).json(newTransaction);
   } catch (error) {
-    console.log('crtTrans after catch err l26');
     console.error(error);
     res.status(error.statusCode || 500).json({ error: error.message || 'Internal Server Error' });
   }
@@ -39,11 +36,9 @@ export const deleteTransaction = async (req, res) => {
     if (!response.user.equals(user)) {
       throw errorRequest(403, 'Access denied');
     }
-
     if (!response) {
       throw errorRequest(404, 'Not found');
     }
-
     res.status(200).json({
       message: 'Transaction deleted',
       response,
@@ -57,16 +52,11 @@ export const updateTransaction = async (req, res) => {
   try {
     const { transactionId } = req.params;
     const { _id: user } = req.user;
-    console.log('user from transCtrl', user);
-
     const response = await Transaction.findById(transactionId);
-
-    console.log('from curr trans', response.user);
 
     if (!response) {
       throw errorRequest(404, 'Not found');
     }
-
     if (!response.user.equals(user)) {
       throw errorRequest(403, 'Access denied');
     }
@@ -84,7 +74,6 @@ export const updateTransaction = async (req, res) => {
 };
 
 export const filterTransactions = async (req, res) => {
-  console.log('filterTransactions function called');
   const { month, year } = req.params;
   console.log('Month:', month, 'Year:', year);
 
@@ -193,9 +182,6 @@ export const getAllCategories = async (req, res) => {
     const totalExpensesResult = await Transaction.aggregate(totalExpensesQuery);
     const totalExpenses = totalExpensesResult.length ? totalExpensesResult[0].totalExpenses : 0;
     const balance = totalIncome - totalExpenses;
-    console.log(totalExpensesResult);
-    console.log(totalExpenses);
-    console.log(balance);
 
     const expensesByCategoriesQuery = [
       {
