@@ -149,7 +149,7 @@ export const getAllCategories = async (req, res) => {
       {
         $match: {
           user: new mongoose.Types.ObjectId(req.user._id),
-          category: 'income',
+          isIncome: true,
         },
       },
       {
@@ -172,7 +172,7 @@ export const getAllCategories = async (req, res) => {
       {
         $match: {
           user: new mongoose.Types.ObjectId(req.user._id),
-          category: { $ne: 'income' },
+          isIncome: false,
         },
       },
       {
