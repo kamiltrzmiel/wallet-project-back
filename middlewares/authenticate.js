@@ -19,6 +19,7 @@ export const authenticate = async (req, res, next) => {
       throw errorRequest(401, 'Not authorized');
     }
     req.user = user;
+    console.log('user from ath midd', user);
     next();
   } catch {
     throw errorRequest(401, 'Not authorized');
