@@ -54,8 +54,11 @@ export const updateTransaction = async (req, res) => {
   try {
     const { transactionId } = req.params;
     const { _id: user } = req.user;
+    console.log('user from transCtrl', user);
 
     const currentTransactionToEdit = await Transaction.findById(transactionId);
+
+    console.log('from curr trans', currentTransactionToEdit.user);
 
     if (!currentTransactionToEdit) {
       throw errorRequest(404, 'Not found');
