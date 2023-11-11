@@ -1,6 +1,8 @@
 import { app } from './app.js';
 import { config } from 'dotenv';
 import mongoose from 'mongoose';
+import fs from 'fs';
+import https from 'https';
 
 config();
 
@@ -20,7 +22,13 @@ const runServer = async () => {
   try {
     const connection = await mongoose.connect(uriDb);
     console.log('Database connection successful');
-    app.listen(3000, () => {
+
+    const options = {
+      key: process.env.KEY,
+      cert: process.env.CERT,
+    };
+
+    https.createServer(options, app).listen(3000, () => {
       console.log('Server running. Use our API on port: 3000');
       console.log('>>> Press Ctrl+C to stop <<<');
     });
