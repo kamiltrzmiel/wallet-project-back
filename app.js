@@ -3,7 +3,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 
 import { usersRouter } from './routes/userRoutes.js';
-import { transactionRouter } from './routes/transactionRoutes.js';
+// import { transactionRouter } from './routes/transactionRoutes.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocs from './docs/swagger-docs.js';
 
@@ -25,7 +25,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use('/api/users', usersRouter);
-app.use('/api/transactions', transactionRouter);
+// app.use('/api/transactions', transactionRouter);
 
 app.use('/wallet', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 

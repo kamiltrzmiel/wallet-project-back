@@ -1,8 +1,10 @@
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/user.js';
+// import { User } from '../models/user.js';
 import { errorRequest } from '../assets/errorMessages.js';
+import db from '../db/db.js';
+import { aql } from 'arangojs';
 
 dotenv.config();
 
@@ -11,17 +13,35 @@ const secKey = process.env.SECRET_KEY;
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (user) {
+
+    // czy user istnieje
+    const userCursor = await db.query(aql`
+      FOR u IN users
+      FILTER u.email == ${email}
+      RETURN u
+    `);
+    const existingUser = await userCursor.next();
+
+    if (existingUser) {
       throw errorRequest(409, 'Email in use');
     }
+
     const hashPassword = await bcrypt.hash(password, 10);
-    const result = await User.create({ name, email, password: hashPassword });
+
+    // tworzy usera
+    const user = await db.query(aql`
+      INSERT {
+        name: ${name},
+        email: ${email},
+        password: ${hashPassword}
+      } INTO users RETURN NEW
+    `);
+    const result = await user.next();
 
     res.status(201).json({
       name: result.name,
       email: result.email,
-      subscription: result.subscription,
+      // trzeba dostosowac do tego co w Arango
     });
   } catch (err) {
     res.status(err.statusCode || 500).json({ error: err.message || 'Internal Server Error' });
@@ -31,21 +51,36 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+
+    // znajduje usera po emailu
+    const userCursor = await db.query(aql`
+      FOR u IN users
+      FILTER u.email == ${email}
+      RETURN u
+    `);
+    const user = await userCursor.next();
+
     if (!user) {
       throw errorRequest(401, 'Email or password is wrong');
     }
+
     const passwordCompare = await bcrypt.compare(password, user.password);
     if (!passwordCompare) {
       throw errorRequest(401, 'Email or password is wrong');
     }
 
+    // generuje JWT token
     const payload = {
       id: user._id,
     };
 
     const token = jwt.sign(payload, secKey, { expiresIn: '12h' });
-    await User.findByIdAndUpdate(user._id, { token });
+
+    // update tokena dla usera
+    await db.query(aql`
+      UPDATE ${user._id} WITH { token: ${token} } IN users
+    `);
+
     res.status(200).json({
       message: 'Login success',
       token,
@@ -73,7 +108,13 @@ export const getCurrent = async (req, res) => {
 
 export const profile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    // znajduje usera po id
+    const userCursor = await db.query(aql`
+      FOR u IN users
+      FILTER u._id == ${req.user.id}
+      RETURN u
+    `);
+    const user = await userCursor.next();
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
